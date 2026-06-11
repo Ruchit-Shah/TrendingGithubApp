@@ -8,17 +8,17 @@
 import Foundation
 import Combine
 
-final class RepositoryService:
-RepositoryServiceProtocol {
+final class RepositoryService: RepositoryServiceProtocol {
 
     private let apiClient: APIClient
     private let cacheService: CacheServiceProtocol
+
+    private(set) var didReturnCachedData = false
 
     init(
         apiClient: APIClient,
         cacheService: CacheServiceProtocol
     ) {
-
         self.apiClient = apiClient
         self.cacheService = cacheService
     }
@@ -27,39 +27,30 @@ RepositoryServiceProtocol {
         page: Int
     ) -> AnyPublisher<[Repository], Error> {
 
-        apiClient
+        didReturnCachedData = false
+
+        return apiClient
             .fetchRepositories(page: page)
-
             .handleEvents(
-                receiveOutput: { [weak self]
-                    repos in
-
-                    self?.cacheService
-                        .save(repositories: repos)
+                receiveOutput: { [weak self] repos in
+                    self?.cacheService.save(repositories: repos)
                 }
             )
+            .catch { [weak self] error -> AnyPublisher<[Repository], Error> in
 
-            .catch { [weak self] error in
+                let cached = self?.cacheService.fetchRepositories() ?? []
 
-                let cached =
-                self?.cacheService
-                    .fetchRepositories() ?? []
-
-                if cached.isEmpty {
-
-                    return Fail<[Repository], Error>(
-                        error: error
-                    )
-                    .eraseToAnyPublisher()
+                guard !cached.isEmpty else {
+                    return Fail(error: error)
+                        .eraseToAnyPublisher()
                 }
 
+                self?.didReturnCachedData = true
+
                 return Just(cached)
-                    .setFailureType(
-                        to: Error.self
-                    )
+                    .setFailureType(to: Error.self)
                     .eraseToAnyPublisher()
             }
-
             .eraseToAnyPublisher()
     }
 }

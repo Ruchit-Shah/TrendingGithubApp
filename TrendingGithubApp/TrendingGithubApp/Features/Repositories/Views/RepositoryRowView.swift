@@ -13,45 +13,46 @@ struct RepositoryRowView: View {
 
     var body: some View {
 
-        HStack {
+        HStack(spacing: 12) {
 
             AsyncImage(
-                url: URL(
-                    string:
-                    repository.owner.avatarURL
-                )
-            )
-
-            { image in
+                url: URL(string: repository.owner.avatarURL)
+            ) { image in
 
                 image
                     .resizable()
+                    .scaledToFill()
 
             } placeholder: {
 
                 ProgressView()
             }
+            .frame(width: 50, height: 50)
+            .clipShape(Circle())
 
-            .frame(
-                width: 50,
-                height: 50
-            )
-
-            VStack(
-                alignment: .leading
-            ) {
+            VStack(alignment: .leading, spacing: 6) {
 
                 Text(repository.name)
+                    .font(.headline)
+                    .lineLimit(1)
 
-                Text(
-                    repository.language
-                    ?? "Unknown"
-                )
+                Text(repository.owner.login)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
-                Text(
-                    "⭐️ \(repository.stargazersCount)"
-                )
+                HStack(spacing: 12) {
+
+                    Label(
+                        "\(repository.stargazersCount)",
+                        systemImage: "star.fill"
+                    )
+
+                    Text(repository.language ?? "Unknown")
+                }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
         }
+        .padding(.vertical, 6)
     }
 }

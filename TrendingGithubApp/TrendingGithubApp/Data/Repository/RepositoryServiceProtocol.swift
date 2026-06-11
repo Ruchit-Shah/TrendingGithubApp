@@ -10,6 +10,8 @@ import Combine
 
 protocol RepositoryServiceProtocol {
 
+    var didReturnCachedData: Bool { get }
+
     func fetchRepositories(
         page: Int
     ) -> AnyPublisher<[Repository], Error>

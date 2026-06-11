@@ -10,25 +10,12 @@ import SwiftUI
 @main
 struct TrendingGithubApp: App {
 
-    private let apiClient: APIClient
-    private let cacheService: CacheServiceProtocol
-    private let repositoryService: RepositoryServiceProtocol
-
-    init() {
-        self.apiClient = GitHubAPIClient()
-        self.cacheService = CacheService()
-        self.repositoryService = RepositoryService(
-            apiClient: apiClient,
-            cacheService: cacheService
-        )
-    }
+    private let container = AppDIContainer()
 
     var body: some Scene {
         WindowGroup {
             RepositoryListView(
-                viewModel: RepositoryListViewModel(
-                    service: repositoryService
-                )
+                viewModel: container.makeRepositoryListViewModel()
             )
         }
     }

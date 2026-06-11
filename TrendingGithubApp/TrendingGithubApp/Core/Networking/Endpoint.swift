@@ -9,13 +9,18 @@ import Foundation
 
 enum Endpoint {
 
-    static func repositories(
-        page: Int
-    ) -> URL? {
+    static func repositories(page: Int) -> URL? {
 
-        URL(
-            string:
-            "https://api.github.com/search/repositories?q=stars:>1000&sort=stars&page=\(page)"
+        var components = URLComponents(
+            string: "https://api.github.com/search/repositories"
         )
+
+        components?.queryItems = [
+            URLQueryItem(name: "q", value: "stars:>1000"),
+            URLQueryItem(name: "sort", value: "stars"),
+            URLQueryItem(name: "page", value: "\(page)")
+        ]
+
+        return components?.url
     }
 }

@@ -8,11 +8,42 @@
 import SwiftUI
 
 struct ErrorBannerView: View {
+
+    let message: String
+    let onDismiss: () -> Void
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+
+        HStack(alignment: .top, spacing: 12) {
+
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.white)
+
+            Text(message)
+                .font(.subheadline)
+                .foregroundStyle(.white)
+                .multilineTextAlignment(.leading)
+
+            Spacer()
+
+            Button {
+                onDismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .foregroundStyle(.white)
+            }
+        }
+        .padding()
+        .background(Color.red)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(radius: 4)
     }
 }
 
 #Preview {
-    ErrorBannerView()
+    ErrorBannerView(
+        message: "Something went wrong. Showing cached data.",
+        onDismiss: {}
+    )
+    .padding()
 }
